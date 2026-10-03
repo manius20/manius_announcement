@@ -1,0 +1,18 @@
+name: ManiusAnnouncements
+version: 1.0
+main: com.example.maniusannouncements.ManiusAnnouncements
+api-version: '1.21'
+commands:
+  maniusactionbar:
+    description: Wysyła ogłoszenie na Actionbarze
+    permission: manius.admin
+  maniusbossbar:
+    description: Wysyła ogłoszenie na Bossbarze
+    permission: manius.admin
+  maniustitle:
+    description: Wysyła ogłoszenie na czacie
+    permission: manius.admin
+  maniusannouncements:
+    description: Zarządzanie ogłoszeniami i historia
+    permission: manius.admin
+    aliases: [mannounce]
