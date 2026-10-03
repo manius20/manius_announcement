@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Konfiguracja Javy 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -27,7 +27,7 @@ jobs:
           chmod +x gradlew
 
       - name: Budowanie pliku JAR
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace
 
       - name: Udostępnienie gotowego pliku .jar (Artifact)
         uses: actions/upload-artifact@v4
