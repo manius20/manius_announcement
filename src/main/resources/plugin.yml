@@ -1,4 +1,4 @@
-name: ManiusAnnouncements
+name: Manius_Announcements
 version: 1.0
 main: com.example.maniusannouncements.ManiusAnnouncements
 api-version: 1.20
@@ -20,10 +20,14 @@ commands:
     description: Usuwa obecny BossBar
     permission: manius.admin
     aliases: [mbbusun]
-  maniustitle:
+  maniuschat:
     description: Wysyła ogłoszenie na czacie
     permission: manius.admin
     aliases: [mchat]
+  maniustitle:
+    description: Wysyła ogłoszenie Title na środku ekranu
+    permission: manius.admin
+    aliases: [mtitle]
   maniusannouncements:
     description: Główna komenda pluginu
     permission: manius.admin
