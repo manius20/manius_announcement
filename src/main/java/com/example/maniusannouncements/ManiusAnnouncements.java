@@ -204,9 +204,13 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
     public void sendChatAnnouncementToAll(String text) {
         String header = getConfig().getString("formats.chat-header", "&b&l[OGŁOSZENIE]");
-        String chatFormat = getConfig().getString("formats.chat-format", "{header}\n&f{message}");
+        String chatFormat = getConfig().getString("formats.chat-format", "{header}\n\n&f{message}");
 
-        String formatted = parseColor(chatFormat.replace("{header}", header).replace("{message}", text));
+        String formatted = parseColor(chatFormat)
+                .replace("\\n", "\n")
+                .replace("{header}", parseColor(header))
+                .replace("{message}", parseColor(text));
+
         String[] lines = formatted.split("\n");
 
         for (Player p : Bukkit.getOnlinePlayers()) {
