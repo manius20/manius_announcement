@@ -203,15 +203,12 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendChatAnnouncementToAll(String text) {
-        String border = parseColor("&b&m========================================");
+        String header = parseColor("&bOGŁOSZENIE");
         String msg = parseColor("&f" + text);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage("");
-            p.sendMessage(border);
+            p.sendMessage(header);
             p.sendMessage(msg);
-            p.sendMessage(border);
-            p.sendMessage("");
         }
     }
 
