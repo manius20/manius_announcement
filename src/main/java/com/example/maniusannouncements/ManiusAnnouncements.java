@@ -21,22 +21,34 @@ import java.util.List;
 public final class ManiusAnnouncements extends JavaPlugin implements CommandExecutor {
 
     private final List<BukkitTask> activeTasks = new ArrayList<>();
+    private final List<BossBar> activeBossBars = new ArrayList<>();
+    private BukkitTask activeActionBarTask = null;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        if (getCommand("maniusactionbar") != null) getCommand("maniusactionbar").setExecutor(this);
-        if (getCommand("maniusbossbar") != null) getCommand("maniusbossbar").setExecutor(this);
-        if (getCommand("maniustitle") != null) getCommand("maniustitle").setExecutor(this);
-        if (getCommand("maniusannouncements") != null) getCommand("maniusannouncements").setExecutor(this);
+        registerCommand("maniusactionbar");
+        registerCommand("maniusbossbar");
+        registerCommand("maniustitle");
+        registerCommand("maniusannouncements");
+        registerCommand("maniusbossbarusun");
+        registerCommand("maniusactionbarusun");
 
         startAutoAnnouncers();
+    }
+
+    private void registerCommand(String name) {
+        if (getCommand(name) != null) {
+            getCommand(name).setExecutor(this);
+        }
     }
 
     @Override
     public void onDisable() {
         stopAutoAnnouncers();
+        clearActiveBossBars();
+        stopActiveActionBar();
     }
 
     @Override
@@ -48,10 +60,26 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
         String cmd = command.getName().toLowerCase();
 
+        // Usuwanie aktywnego BossBara
+        if (cmd.equals("maniusbossbarusun")) {
+            clearActiveBossBars();
+            sender.sendMessage(parseColor(getConfig().getString("prefix", "") + "&aPomyślnie usunięto wszystkie aktywne BossBary."));
+            return true;
+        }
+
+        // Usuwanie aktywnego ActionBar
+        if (cmd.equals("maniusactionbarusun")) {
+            stopActiveActionBar();
+            sender.sendMessage(parseColor(getConfig().getString("prefix", "") + "&aPomyślnie zatrzymano wyświetlanie ActionBara."));
+            return true;
+        }
+
         if (cmd.equals("maniusannouncements")) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 reloadConfig();
                 stopAutoAnnouncers();
+                clearActiveBossBars();
+                stopActiveActionBar();
                 startAutoAnnouncers();
                 sender.sendMessage(parseColor(getConfig().getString("prefix", "") + getConfig().getString("messages.config-reloaded")));
                 return true;
@@ -73,7 +101,9 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
             sender.sendMessage(parseColor("&b=== ManiusAnnouncements Komendy ==="));
             sender.sendMessage(parseColor("&3/maniusactionbar <tekst> &7- Odpala actionbar"));
+            sender.sendMessage(parseColor("&3/maniusactionbarusun &7- Usuwa obecny actionbar"));
             sender.sendMessage(parseColor("&3/maniusbossbar <tekst> &7- Odpala bossbar"));
+            sender.sendMessage(parseColor("&3/maniusbossbarusun &7- Usuwa obecny bossbar"));
             sender.sendMessage(parseColor("&3/maniustitle <tekst> &7- Odpala ogłoszenie na czacie"));
             sender.sendMessage(parseColor("&3/mannounce history <actionbar/bossbar/chat> &7- Wyświetla historię"));
             sender.sendMessage(parseColor("&3/mannounce reload &7- Przeładowuje config"));
@@ -106,14 +136,16 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendActionBarToAll(String text, int seconds) {
+        stopActiveActionBar();
         String coloredText = parseColor(text);
-        new BukkitRunnable() {
+
+        activeActionBarTask = new BukkitRunnable() {
             int left = seconds;
 
             @Override
             public void run() {
                 if (left <= 0) {
-                    cancel();
+                    stopActiveActionBar();
                     return;
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -125,6 +157,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendBossBarToAll(String text, int seconds) {
+        clearActiveBossBars();
         String coloredText = parseColor(text);
         BarColor color;
         BarStyle style;
@@ -148,6 +181,8 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             bar.addPlayer(p);
         }
 
+        activeBossBars.add(bar);
+
         new BukkitRunnable() {
             int totalTicks = seconds * 20;
             int currentTicks = 0;
@@ -156,8 +191,9 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             public void run() {
                 currentTicks += 2;
                 double progress = 1.0 - ((double) currentTicks / totalTicks);
-                if (progress <= 0.0) {
+                if (progress <= 0.0 || !activeBossBars.contains(bar)) {
                     bar.removeAll();
+                    activeBossBars.remove(bar);
                     cancel();
                     return;
                 }
@@ -176,6 +212,20 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             p.sendMessage(msg);
             p.sendMessage(border);
             p.sendMessage("");
+        }
+    }
+
+    private void clearActiveBossBars() {
+        for (BossBar bar : new ArrayList<>(activeBossBars)) {
+            bar.removeAll();
+        }
+        activeBossBars.clear();
+    }
+
+    private void stopActiveActionBar() {
+        if (activeActionBarTask != null) {
+            activeActionBarTask.cancel();
+            activeActionBarTask = null;
         }
     }
 
