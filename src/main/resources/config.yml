@@ -1,4 +1,4 @@
-prefix: "&8[&bManius&8] "
+prefix: "&b&lS16 smp 2&8 "
 
 messages:
   no-permission: "&cNie masz uprawnień do tej komendy!"
@@ -19,20 +19,20 @@ formats:
 auto-announcer:
   chat:
     enabled: true
-    interval: 300 # w sekundach
+    interval: 300 # czas w sekundach między ogłoszeniami
     messages:
       - "Pamiętaj o zarejestrowaniu się na naszym Discordzie!"
       - "Głosuj na serwer, aby otrzymać darmowe nagrody."
   actionbar:
     enabled: true
-    interval: 180
-    duration: 5 # domyślny czas w sekundach
+    interval: 180 # czas w sekundach między ogłoszeniami
+    duration: 5   # domyślny czas wyświetlania w sekundach
     messages:
       - "&aSklep serwerowy: www.twojsklep.pl"
   bossbar:
     enabled: true
-    interval: 240
-    duration: 10 # domyślny czas w sekundach
+    interval: 240 # czas w sekundach między ogłoszeniami
+    duration: 10  # domyślny czas wyświetlania w sekundach
     color: "BLUE"
     style: "SOLID"
     messages:
