@@ -1,9 +1,12 @@
 package com.example.maniusannouncements;
 
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -103,7 +106,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendActionBarToAll(String text, int seconds) {
-        Component comp = parseColor(text);
+        String coloredText = parseColor(text);
         new BukkitRunnable() {
             int left = seconds;
 
@@ -114,7 +117,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
                     return;
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendActionBar(comp);
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(coloredText));
                 }
                 left--;
             }
@@ -122,26 +125,27 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendBossBarToAll(String text, int seconds) {
-        Component comp = parseColor(text);
-        BossBar.Color color;
-        BossBar.Style style;
+        String coloredText = parseColor(text);
+        BarColor color;
+        BarStyle style;
 
         try {
-            color = BossBar.Color.valueOf(getConfig().getString("auto-announcer.bossbar.color", "BLUE").toUpperCase());
+            color = BarColor.valueOf(getConfig().getString("auto-announcer.bossbar.color", "BLUE").toUpperCase());
         } catch (Exception e) {
-            color = BossBar.Color.BLUE;
+            color = BarColor.BLUE;
         }
 
         try {
-            style = BossBar.Style.valueOf(getConfig().getString("auto-announcer.bossbar.style", "SOLID").toUpperCase());
+            style = BarStyle.valueOf(getConfig().getString("auto-announcer.bossbar.style", "SOLID").toUpperCase());
         } catch (Exception e) {
-            style = BossBar.Style.SOLID;
+            style = BarStyle.SOLID;
         }
 
-        BossBar bar = BossBar.bossBar(comp, 1.0f, color, style);
+        BossBar bar = Bukkit.createBossBar(coloredText, color, style);
+        bar.setProgress(1.0);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.showBossBar(bar);
+            bar.addPlayer(p);
         }
 
         new BukkitRunnable() {
@@ -151,29 +155,27 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             @Override
             public void run() {
                 currentTicks += 2;
-                float progress = 1.0f - ((float) currentTicks / totalTicks);
-                if (progress <= 0.0f) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.hideBossBar(bar);
-                    }
+                double progress = 1.0 - ((double) currentTicks / totalTicks);
+                if (progress <= 0.0) {
+                    bar.removeAll();
                     cancel();
                     return;
                 }
-                bar.progress(Math.max(0.0f, progress));
+                bar.setProgress(Math.max(0.0, progress));
             }
         }.runTaskTimer(this, 0L, 2L);
     }
 
     public void sendChatAnnouncementToAll(String text) {
-        Component border = parseColor("&b&m========================================");
-        Component msg = parseColor("&f" + text);
+        String border = parseColor("&b&m========================================");
+        String msg = parseColor("&f" + text);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage(Component.empty());
+            p.sendMessage("");
             p.sendMessage(border);
             p.sendMessage(msg);
             p.sendMessage(border);
-            p.sendMessage(Component.empty());
+            p.sendMessage("");
         }
     }
 
@@ -244,7 +246,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
         activeTasks.clear();
     }
 
-    private Component parseColor(String text) {
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
+    private String parseColor(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 }
