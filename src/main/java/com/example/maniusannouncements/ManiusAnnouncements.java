@@ -78,8 +78,8 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
         }
 
         if (args.length == 0) {
-            String usagePath = "messages.usage-" + cmd.replace("manius", "");
-            sender.sendMessage(parseColor(getConfig().getString("prefix", "") + getConfig().getString(usagePath)));
+            String usageKey = cmd.replace("manius", "");
+            sender.sendMessage(parseColor(getConfig().getString("prefix", "") + getConfig().getString("messages.usage-" + usageKey)));
             return true;
         }
 
@@ -123,8 +123,20 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
     public void sendBossBarToAll(String text, int seconds) {
         Component comp = parseColor(text);
-        BossBar.Color color = BossBar.Color.valueOf(getConfig().getString("auto-announcer.bossbar.color", "BLUE"));
-        BossBar.Style style = BossBar.Style.valueOf(getConfig().getString("auto-announcer.bossbar.style", "SOLID"));
+        BossBar.Color color;
+        BossBar.Style style;
+
+        try {
+            color = BossBar.Color.valueOf(getConfig().getString("auto-announcer.bossbar.color", "BLUE").toUpperCase());
+        } catch (Exception e) {
+            color = BossBar.Color.BLUE;
+        }
+
+        try {
+            style = BossBar.Style.valueOf(getConfig().getString("auto-announcer.bossbar.style", "SOLID").toUpperCase());
+        } catch (Exception e) {
+            style = BossBar.Style.SOLID;
+        }
 
         BossBar bar = BossBar.bossBar(comp, 1.0f, color, style);
 
@@ -168,13 +180,12 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     private void saveToHistory(String type, String message) {
         List<String> hist = getConfig().getStringList("history." + type);
         hist.add(message);
-        if (hist.size() > 10) hist.remove(0); // Zapisuje ostatnie 10 ogłoszeń
+        if (hist.size() > 10) hist.remove(0);
         getConfig().set("history." + type, hist);
         saveConfig();
     }
 
     private void startAutoAnnouncers() {
-        // Auto Chat
         if (getConfig().getBoolean("auto-announcer.chat.enabled", true)) {
             int interval = getConfig().getInt("auto-announcer.chat.interval", 300) * 20;
             List<String> msgs = getConfig().getStringList("auto-announcer.chat.messages");
@@ -191,7 +202,6 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             }
         }
 
-        // Auto Actionbar
         if (getConfig().getBoolean("auto-announcer.actionbar.enabled", true)) {
             int interval = getConfig().getInt("auto-announcer.actionbar.interval", 180) * 20;
             int duration = getConfig().getInt("auto-announcer.actionbar.duration", 5);
@@ -209,7 +219,6 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             }
         }
 
-        // Auto Bossbar
         if (getConfig().getBoolean("auto-announcer.bossbar.enabled", true)) {
             int interval = getConfig().getInt("auto-announcer.bossbar.interval", 240) * 20;
             int duration = getConfig().getInt("auto-announcer.bossbar.duration", 10);
