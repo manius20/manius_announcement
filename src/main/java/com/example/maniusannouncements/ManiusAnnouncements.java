@@ -60,14 +60,12 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
         String cmd = command.getName().toLowerCase();
 
-        // Usuwanie aktywnego BossBara
         if (cmd.equals("maniusbossbarusun")) {
             clearActiveBossBars();
             sender.sendMessage(parseColor(getConfig().getString("prefix", "") + "&aPomyślnie usunięto wszystkie aktywne BossBary."));
             return true;
         }
 
-        // Usuwanie aktywnego ActionBar
         if (cmd.equals("maniusactionbarusun")) {
             stopActiveActionBar();
             sender.sendMessage(parseColor(getConfig().getString("prefix", "") + "&aPomyślnie zatrzymano wyświetlanie ActionBara."));
@@ -100,9 +98,9 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             }
 
             sender.sendMessage(parseColor("&b=== ManiusAnnouncements Komendy ==="));
-            sender.sendMessage(parseColor("&3/maniusactionbar <tekst> &7- Odpala actionbar"));
+            sender.sendMessage(parseColor("&3/maniusactionbar <tekst> [czas s/m/h] &7- Odpala actionbar"));
             sender.sendMessage(parseColor("&3/maniusactionbarusun &7- Usuwa obecny actionbar"));
-            sender.sendMessage(parseColor("&3/maniusbossbar <tekst> &7- Odpala bossbar"));
+            sender.sendMessage(parseColor("&3/maniusbossbar <tekst> [czas s/m/h] &7- Odpala bossbar"));
             sender.sendMessage(parseColor("&3/maniusbossbarusun &7- Usuwa obecny bossbar"));
             sender.sendMessage(parseColor("&3/maniustitle <tekst> &7- Odpala ogłoszenie na czacie"));
             sender.sendMessage(parseColor("&3/mannounce history <actionbar/bossbar/chat> &7- Wyświetla historię"));
@@ -116,17 +114,16 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             return true;
         }
 
-        String message = String.join(" ", args);
-
         if (cmd.equals("maniusactionbar")) {
-            int duration = getConfig().getInt("auto-announcer.actionbar.duration", 5);
-            sendActionBarToAll(message, duration);
-            saveToHistory("actionbar", message);
+            ParsedMessage pm = parseMessageAndDuration(args, getConfig().getInt("auto-announcer.actionbar.duration", 5));
+            sendActionBarToAll(pm.message, pm.seconds);
+            saveToHistory("actionbar", pm.message);
         } else if (cmd.equals("maniusbossbar")) {
-            int duration = getConfig().getInt("auto-announcer.bossbar.duration", 10);
-            sendBossBarToAll(message, duration);
-            saveToHistory("bossbar", message);
+            ParsedMessage pm = parseMessageAndDuration(args, getConfig().getInt("auto-announcer.bossbar.duration", 10));
+            sendBossBarToAll(pm.message, pm.seconds);
+            saveToHistory("bossbar", pm.message);
         } else if (cmd.equals("maniustitle")) {
+            String message = String.join(" ", args);
             sendChatAnnouncementToAll(message);
             saveToHistory("chat", message);
         }
@@ -137,7 +134,8 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
     public void sendActionBarToAll(String text, int seconds) {
         stopActiveActionBar();
-        String coloredText = parseColor(text);
+        String format = getConfig().getString("formats.actionbar-format", "{message}");
+        String formattedText = parseColor(format.replace("{message}", text));
 
         activeActionBarTask = new BukkitRunnable() {
             int left = seconds;
@@ -149,7 +147,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
                     return;
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(coloredText));
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(formattedText));
                 }
                 left--;
             }
@@ -158,7 +156,9 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
     public void sendBossBarToAll(String text, int seconds) {
         clearActiveBossBars();
-        String coloredText = parseColor(text);
+        String format = getConfig().getString("formats.bossbar-format", "{message}");
+        String formattedText = parseColor(format.replace("{message}", text));
+
         BarColor color;
         BarStyle style;
 
@@ -174,7 +174,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             style = BarStyle.SOLID;
         }
 
-        BossBar bar = Bukkit.createBossBar(coloredText, color, style);
+        BossBar bar = Bukkit.createBossBar(formattedText, color, style);
         bar.setProgress(1.0);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -203,12 +203,58 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
     }
 
     public void sendChatAnnouncementToAll(String text) {
-        String header = parseColor("&bOGŁOSZENIE");
-        String msg = parseColor("&f" + text);
+        String header = getConfig().getString("formats.chat-header", "&b&l[OGŁOSZENIE]");
+        String chatFormat = getConfig().getString("formats.chat-format", "{header}\n&f{message}");
+
+        String formatted = parseColor(chatFormat.replace("{header}", header).replace("{message}", text));
+        String[] lines = formatted.split("\n");
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.sendMessage(header);
-            p.sendMessage(msg);
+            for (String line : lines) {
+                p.sendMessage(line);
+            }
+        }
+    }
+
+    private ParsedMessage parseMessageAndDuration(String[] args, int defaultSeconds) {
+        if (args.length == 0) {
+            return new ParsedMessage("", defaultSeconds);
+        }
+
+        String lastArg = args[args.length - 1].toLowerCase();
+        int parsedSeconds = parseTimeString(lastArg);
+
+        if (parsedSeconds > 0 && args.length > 1) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < args.length - 1; i++) {
+                sb.append(args[i]).append(" ");
+            }
+            return new ParsedMessage(sb.toString().trim(), parsedSeconds);
+        } else {
+            return new ParsedMessage(String.join(" ", args), defaultSeconds);
+        }
+    }
+
+    private int parseTimeString(String input) {
+        try {
+            if (input.endsWith("s")) {
+                return Integer.parseInt(input.substring(0, input.length() - 1));
+            } else if (input.endsWith("m")) {
+                return Integer.parseInt(input.substring(0, input.length() - 1)) * 60;
+            } else if (input.endsWith("h")) {
+                return Integer.parseInt(input.substring(0, input.length() - 1)) * 3600;
+            }
+        } catch (NumberFormatException ignored) {}
+        return -1;
+    }
+
+    private static class ParsedMessage {
+        final String message;
+        final int seconds;
+
+        ParsedMessage(String message, int seconds) {
+            this.message = message;
+            this.seconds = seconds;
         }
     }
 
