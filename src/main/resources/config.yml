@@ -1,4 +1,4 @@
-prefix: "&b&lS16 smp 2&8 "
+prefix: "&l&bS16 smp 2&8 "
 
 messages:
   no-permission: "&cNie masz uprawnień do tej komendy!"
@@ -12,7 +12,7 @@ messages:
 # Formaty wyświetlania ogłoszeń
 formats:
   chat-header: "&b&l[OGŁOSZENIE]"
-  chat-format: "{header}\n&f{message}"
+  chat-format: "{header}\n\n&f{message}"
   actionbar-format: "&e{message}"
   bossbar-format: "&a{message}"
 
