@@ -1,40 +1,44 @@
-# Settings for Auto-Announcements (times in seconds)
+prefix: "&8[&bManius&8] "
+
+messages:
+  no-permission: "&cNie masz uprawnień do tej komendy!"
+  config-reloaded: "&aKonfiguracja przeładowana!"
+  broadcast-sent: "&aOgłoszenie zostało wysłane!"
+  history-empty: "&cBrak historii dla tego typu ogłoszeń."
+  usage-actionbar: "&cUżycie: /maniusactionbar <wiadomość> [czas s/m/h]"
+  usage-bossbar: "&cUżycie: /maniusbossbar <wiadomość> [czas s/m/h]"
+  usage-title: "&cUżycie: /maniustitle <wiadomość>"
+
+# Formaty wyświetlania ogłoszeń
+formats:
+  chat-header: "&b&l[OGŁOSZENIE]"
+  chat-format: "{header}\n&f{message}"
+  actionbar-format: "&e{message}"
+  bossbar-format: "&a{message}"
+
 auto-announcer:
   chat:
     enabled: true
-    interval: 300 # seconds (5 min)
+    interval: 300 # w sekundach
     messages:
-      - "&b[OGŁOSZENIE] &fOdwiedź nasz sklep na stronie internetowej!"
-      - "&b[OGŁOSZENIE] &fPamiętaj o przestrzeganiu regulaminu serwera."
+      - "Pamiętaj o zarejestrowaniu się na naszym Discordzie!"
+      - "Głosuj na serwer, aby otrzymać darmowe nagrody."
   actionbar:
     enabled: true
-    interval: 180 # seconds
-    duration: 5   # display duration in seconds
+    interval: 180
+    duration: 5 # domyślny czas w sekundach
     messages:
-      - "&3 Dołącz do naszego Discorda! &b/discord"
+      - "&aSklep serwerowy: www.twojsklep.pl"
   bossbar:
     enabled: true
-    interval: 240 # seconds
-    duration: 10  # display duration in seconds
-    color: "BLUE" # BLUE, CYAN, PINK, PURPLE, RED, WHITE, YELLOW
-    style: "SOLID" # SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+    interval: 240
+    duration: 10 # domyślny czas w sekundach
+    color: "BLUE"
+    style: "SOLID"
     messages:
-      - "&b&lSERWER &8| &fŻyczymy miłej gry na naszym serwerze!"
+      - "&bWitaj na serwerze! Życzymy miłej gry."
 
-# Message prefix and colors
-prefix: "&b&lMANIUS &8» &f"
-
-messages:
-  no-permission: "&cBrak uprawnień do użycia tej komendy!"
-  usage-actionbar: "&cUżycie: /maniusactionbar <wiadomość>"
-  usage-bossbar: "&cUżycie: /maniusbossbar <wiadomość>"
-  usage-title: "&cUżycie: /maniustitle <wiadomość>"
-  broadcast-sent: "&aPomyślnie wysłano ogłoszenie do wszystkich graczy!"
-  config-reloaded: "&aKonfiguracja została pomyślnie przeładowana!"
-  history-empty: "&cBrak zapisanych ogłoszeń w historii!"
-
-# History storage for old broadcasts
 history:
+  chat: []
   actionbar: []
   bossbar: []
-  chat: []
