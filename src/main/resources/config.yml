@@ -1,0 +1,40 @@
+# Settings for Auto-Announcements (times in seconds)
+auto-announcer:
+  chat:
+    enabled: true
+    interval: 300 # seconds (5 min)
+    messages:
+      - "&b[OGŁOSZENIE] &fOdwiedź nasz sklep na stronie internetowej!"
+      - "&b[OGŁOSZENIE] &fPamiętaj o przestrzeganiu regulaminu serwera."
+  actionbar:
+    enabled: true
+    interval: 180 # seconds
+    duration: 5   # display duration in seconds
+    messages:
+      - "&3 Dołącz do naszego Discorda! &b/discord"
+  bossbar:
+    enabled: true
+    interval: 240 # seconds
+    duration: 10  # display duration in seconds
+    color: "BLUE" # BLUE, CYAN, PINK, PURPLE, RED, WHITE, YELLOW
+    style: "SOLID" # SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+    messages:
+      - "&b&lSERWER &8| &fŻyczymy miłej gry na naszym serwerze!"
+
+# Message prefix and colors
+prefix: "&b&lMANIUS &8» &f"
+
+messages:
+  no-permission: "&cBrak uprawnień do użycia tej komendy!"
+  usage-actionbar: "&cUżycie: /maniusactionbar <wiadomość>"
+  usage-bossbar: "&cUżycie: /maniusbossbar <wiadomość>"
+  usage-title: "&cUżycie: /maniustitle <wiadomość>"
+  broadcast-sent: "&aPomyślnie wysłano ogłoszenie do wszystkich graczy!"
+  config-reloaded: "&aKonfiguracja została pomyślnie przeładowana!"
+  history-empty: "&cBrak zapisanych ogłoszeń w historii!"
+
+# History storage for old broadcasts
+history:
+  actionbar: []
+  bossbar: []
+  chat: []
