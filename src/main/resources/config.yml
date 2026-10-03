@@ -1,4 +1,4 @@
-prefix: "&l&bS16 smp 2&8 "
+prefix: "&l&bS16 smp 2& "
 
 messages:
   no-permission: "&cNie masz uprawnień do tej komendy!"
@@ -7,7 +7,8 @@ messages:
   history-empty: "&cBrak historii dla tego typu ogłoszeń."
   usage-actionbar: "&cUżycie: /maniusactionbar <wiadomość> [czas s/m/h]"
   usage-bossbar: "&cUżycie: /maniusbossbar <wiadomość> [czas s/m/h]"
-  usage-title: "&cUżycie: /maniustitle <wiadomość>"
+  usage-chat: "&cUżycie: /maniuschat <wiadomość>"
+  usage-title: "&cUżycie: /maniustitle <wiadomość> [czas s/m/h]"
 
 # Formaty wyświetlania ogłoszeń
 formats:
@@ -15,6 +16,14 @@ formats:
   chat-format: "{header}\n\n&f{message}"
   actionbar-format: "&e{message}"
   bossbar-format: "&a{message}"
+  title-main: "&b&l[OGŁOSZENIE]"
+  title-sub: "&f{message}"
+
+# Ustawienia pojawiania się i znikania napisu na środku (Title)
+title-settings:
+  default-duration: 5 # domyślny czas w sekundach, jeśli nie podasz czasu w komendzie
+  fade-in: 10         # czas pojawiania się w tickach (20 ticków = 1s)
+  fade-out: 10        # czas znikania w tickach
 
 auto-announcer:
   chat:
@@ -42,3 +51,4 @@ history:
   chat: []
   actionbar: []
   bossbar: []
+  title: []
