@@ -30,6 +30,7 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
 
         registerCommand("maniusactionbar");
         registerCommand("maniusbossbar");
+        registerCommand("maniuschat");
         registerCommand("maniustitle");
         registerCommand("maniusannouncements");
         registerCommand("maniusbossbarusun");
@@ -102,8 +103,9 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             sender.sendMessage(parseColor("&3/maniusactionbarusun &7- Usuwa obecny actionbar"));
             sender.sendMessage(parseColor("&3/maniusbossbar <tekst> [czas s/m/h] &7- Odpala bossbar"));
             sender.sendMessage(parseColor("&3/maniusbossbarusun &7- Usuwa obecny bossbar"));
-            sender.sendMessage(parseColor("&3/maniustitle <tekst> &7- Odpala ogłoszenie na czacie"));
-            sender.sendMessage(parseColor("&3/mannounce history <actionbar/bossbar/chat> &7- Wyświetla historię"));
+            sender.sendMessage(parseColor("&3/maniuschat <tekst> &7- Odpala ogłoszenie na czacie"));
+            sender.sendMessage(parseColor("&3/maniustitle <tekst> [czas s/m/h] &7- Odpala ogłoszenie na środku ekranu (Title)"));
+            sender.sendMessage(parseColor("&3/mannounce history <actionbar/bossbar/chat/title> &7- Wyświetla historię"));
             sender.sendMessage(parseColor("&3/mannounce reload &7- Przeładowuje config"));
             return true;
         }
@@ -122,10 +124,14 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             ParsedMessage pm = parseMessageAndDuration(args, getConfig().getInt("auto-announcer.bossbar.duration", 10));
             sendBossBarToAll(pm.message, pm.seconds);
             saveToHistory("bossbar", pm.message);
-        } else if (cmd.equals("maniustitle")) {
+        } else if (cmd.equals("maniuschat")) {
             String message = String.join(" ", args);
             sendChatAnnouncementToAll(message);
             saveToHistory("chat", message);
+        } else if (cmd.equals("maniustitle")) {
+            ParsedMessage pm = parseMessageAndDuration(args, getConfig().getInt("title-settings.default-duration", 5));
+            sendTitleToAll(pm.message, pm.seconds);
+            saveToHistory("title", pm.message);
         }
 
         sender.sendMessage(parseColor(getConfig().getString("prefix", "") + getConfig().getString("messages.broadcast-sent")));
@@ -217,6 +223,22 @@ public final class ManiusAnnouncements extends JavaPlugin implements CommandExec
             for (String line : lines) {
                 p.sendMessage(line);
             }
+        }
+    }
+
+    public void sendTitleToAll(String text, int seconds) {
+        String mainTitleFormat = getConfig().getString("formats.title-main", "&b&lOGŁOSZENIE");
+        String subTitleFormat = getConfig().getString("formats.title-sub", "&f{message}");
+
+        String mainTitle = parseColor(mainTitleFormat.replace("{message}", text));
+        String subTitle = parseColor(subTitleFormat.replace("{message}", text));
+
+        int fadeIn = getConfig().getInt("title-settings.fade-in", 10);
+        int stay = seconds * 20;
+        int fadeOut = getConfig().getInt("title-settings.fade-out", 10);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendTitle(mainTitle, subTitle, fadeIn, stay, fadeOut);
         }
     }
 
