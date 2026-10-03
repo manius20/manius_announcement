@@ -1,18 +1,30 @@
 name: ManiusAnnouncements
 version: 1.0
 main: com.example.maniusannouncements.ManiusAnnouncements
-api-version: '1.21'
+api-version: 1.20
+
 commands:
   maniusactionbar:
-    description: Wysyła ogłoszenie na Actionbarze
+    description: Wysyła ogłoszenie na ActionBarze
     permission: manius.admin
+    aliases: [mab]
+  maniusactionbarusun:
+    description: Usuwa obecny Actionbar
+    permission: manius.admin
+    aliases: [mabusun]
   maniusbossbar:
-    description: Wysyła ogłoszenie na Bossbarze
+    description: Wysyła ogłoszenie na BossBarze
     permission: manius.admin
+    aliases: [mbb]
+  maniusbossbarusun:
+    description: Usuwa obecny BossBar
+    permission: manius.admin
+    aliases: [mbbusun]
   maniustitle:
     description: Wysyła ogłoszenie na czacie
     permission: manius.admin
+    aliases: [mchat]
   maniusannouncements:
-    description: Zarządzanie ogłoszeniami i historia
+    description: Główna komenda pluginu
     permission: manius.admin
     aliases: [mannounce]
